@@ -1,0 +1,11 @@
+This file explains how to add the banner image displayed in the README.
+
+Steps:
+1. Save the attached banner image (from your message) into this repository at: docs/banner.png
+   - On Windows, you can right-click the image and "Save as" and choose this path.
+2. Commit the file to git:
+   git add docs/banner.png
+   git commit -m "Add README banner"
+   git push origin <your-branch>
+
+Note: Large binary files may need to be tracked with Git LFS if your repository restricts large files. The README references `docs/banner.png` with a width of 900px; you can adjust the width in the README if needed.
