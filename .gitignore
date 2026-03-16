@@ -1,0 +1,24 @@
+# Maven build output
+target/
+
+# Sensitive local configuration
+src/main/resources/config.properties
+
+# Runtime data and logs
+logs/
+data/*.mv.db
+
+# Java build artifacts
+*.class
+*.jar
+*.war
+
+# IDE and OS files
+.vscode/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+Thumbs.db
+Desktop.ini

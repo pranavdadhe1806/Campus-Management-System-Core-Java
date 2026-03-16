@@ -1,0 +1,4 @@
+jdbc.url=jdbc:mysql://localhost:3306/campusdb
+jdbc.username=your_username
+jdbc.password=your_password
+jdbc.driver=com.mysql.cj.jdbc.Driver
