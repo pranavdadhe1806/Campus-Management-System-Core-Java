@@ -117,3 +117,19 @@ CREATE TABLE enrollments (
     FOREIGN KEY (course_id)  REFERENCES courses(course_id)   ON DELETE CASCADE,
     UNIQUE KEY uq_enrollment (student_id, course_id)
 );
+
+-- ============================================
+-- TABLE 8: otp_tokens
+-- Temporary OTP storage for first time login
+-- Verified OTPs deleted instantly
+-- Expired OTPs deleted after 10 minutes
+-- In any case row never lives longer than 10 mins
+-- ============================================
+CREATE TABLE otp_tokens (
+    otp_id          INT          PRIMARY KEY AUTO_INCREMENT,
+    user_id         INT          NOT NULL,
+    otp_code        VARCHAR(6)   NOT NULL,
+    otp_expires_at  DATETIME     NOT NULL,
+    created_at      DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
