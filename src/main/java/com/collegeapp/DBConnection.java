@@ -25,7 +25,8 @@ public class DBConnection {
     private static Connection connection = null;
 
     // Private constructor — prevents anyone from doing new DBConnection()
-    private DBConnection() {}
+    private DBConnection() {
+    }
 
     /**
      * Returns the single shared database connection.
@@ -68,9 +69,8 @@ public class DBConnection {
             // If file not found, getResourceAsStream returns null
             if (input == null) {
                 throw new RuntimeException(
-                    "config.properties not found in src/main/resources. " +
-                    "Copy config.properties.example and fill in your credentials."
-                );
+                        "config.properties not found in src/main/resources. " +
+                                "Copy config.properties.example and fill in your credentials.");
             }
 
             // Load all key=value pairs from the file
@@ -78,21 +78,20 @@ public class DBConnection {
 
         } catch (IOException e) {
             throw new RuntimeException(
-                "Failed to read config.properties: " + e.getMessage(), e);
+                    "Failed to read config.properties: " + e.getMessage(), e);
         }
 
         // Step 2 — Extract the three required values
-        String url      = props.getProperty("jdbc.url");
+        String url = props.getProperty("jdbc.url");
         String username = props.getProperty("jdbc.username");
         String password = props.getProperty("jdbc.password");
-        String driver   = props.getProperty("jdbc.driver");
+        String driver = props.getProperty("jdbc.driver");
 
         // Step 3 — Validate nothing is missing
         if (url == null || username == null || password == null || driver == null) {
             throw new RuntimeException(
-                "config.properties is missing one or more required keys: " +
-                "jdbc.url, jdbc.username, jdbc.password, jdbc.driver"
-            );
+                    "config.properties is missing one or more required keys: " +
+                            "jdbc.url, jdbc.username, jdbc.password, jdbc.driver");
         }
 
         // Step 4 — Load the MySQL JDBC driver class
@@ -100,8 +99,9 @@ public class DBConnection {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(
-                "MySQL JDBC driver not found. Check pom.xml dependencies: "
-                + e.getMessage(), e);
+                    "MySQL JDBC driver not found. Check pom.xml dependencies: "
+                            + e.getMessage(),
+                    e);
         }
 
         // Step 5 — Create and return the actual connection
@@ -112,8 +112,9 @@ public class DBConnection {
 
         } catch (SQLException e) {
             throw new RuntimeException(
-                "Failed to connect to MySQL. Check config.properties and " +
-                "ensure MySQL server is running: " + e.getMessage(), e);
+                    "Failed to connect to MySQL. Check config.properties and " +
+                            "ensure MySQL server is running: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -134,14 +135,3 @@ public class DBConnection {
         }
     }
 }
-```
-
----
-
-## What Each Step Does
-```
-Step 1 → Load config.properties from resources folder
-Step 2 → Extract url, username, password, driver
-Step 3 → Validate none are missing
-Step 4 → Load MySQL driver class into JVM
-Step 5 → Create actual connection and return it
