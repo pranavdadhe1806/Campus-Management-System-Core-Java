@@ -2,30 +2,48 @@
 -- Campus Management System — Database Schema
 -- Developer: Pranav Dadhe
 -- GitHub: pranavdadhe1806
--- Version: 2.0 — March 2026
--- Total Tables: 16
+-- Version: 2.1 — April 2026 (Multi-Tenant)
+-- Total Tables: 17
 -- ============================================
 -- TABLE ORDER (strict dependency order):
---  1. users               ← no FK, auth anchor
---  2. departments         ← no FK, referenced by many
---  3. students            ← needs users + departments
---  4. faculty             ← needs users + departments
---  5. admins              ← needs users
---  6. courses             ← needs departments + faculty
---  7. enrollments         ← needs students + courses
---  8. otp_tokens          ← needs users
---  9. user_profiles       ← needs users
--- 10. attendance          ← needs students + courses + faculty
--- 11. exams               ← needs admins
--- 12. grading_scale       ← no FK, standalone config
--- 13. marks               ← needs exams + students + courses + faculty
--- 14. assignments         ← needs courses + faculty
--- 15. submissions         ← needs assignments + students
--- 16. assignment_comments ← needs assignments + users
+--  1. universities        ← no FK, tenant root
+--  2. users               ← needs universities
+--  3. departments         ← needs universities
+--  4. students            ← needs users + departments
+--  5. faculty             ← needs users + departments
+--  6. admins              ← needs users
+--  7. courses             ← needs universities + departments + faculty
+--  8. enrollments         ← needs students + courses
+--  9. otp_tokens          ← needs users
+-- 10. user_profiles       ← needs users
+-- 11. attendance          ← needs students + courses + faculty
+-- 12. exams               ← needs admins
+-- 13. grading_scale       ← needs universities
+-- 14. marks               ← needs exams + students + courses + faculty
+-- 15. assignments         ← needs courses + faculty
+-- 16. submissions         ← needs assignments + students
+-- 17. assignment_comments ← needs assignments + users
 -- ============================================
 
 CREATE DATABASE IF NOT EXISTS campusdb;
 USE campusdb;
+
+-- ============================================
+-- TABLE 0: universities
+-- Each row represents one university (tenant)
+-- SUPER_ADMIN creates this on first launch
+-- allowed_domain enforces email restrictions
+-- e.g. allowed_domain = 'despu.edu.in'
+-- means only x@despu.edu.in emails can register
+-- ============================================
+CREATE TABLE universities (
+    university_id     INT           PRIMARY KEY AUTO_INCREMENT,
+    university_name   VARCHAR(200)  NOT NULL,
+    allowed_domain    VARCHAR(100)  NOT NULL UNIQUE,
+    logo_path         VARCHAR(500),
+    address           VARCHAR(300),
+    created_at        DATETIME      DEFAULT CURRENT_TIMESTAMP
+);
 
 -- ============================================
 -- TABLE 1: users
@@ -35,12 +53,14 @@ USE campusdb;
 -- ============================================
 CREATE TABLE users (
     user_id         INT           PRIMARY KEY AUTO_INCREMENT,
+    university_id   INT           NOT NULL,
     username        VARCHAR(30)   NOT NULL UNIQUE,
     email           VARCHAR(100)  NOT NULL UNIQUE,
     password_hash   VARCHAR(255)  NOT NULL,
-    role            ENUM('ADMIN','FACULTY','STUDENT') NOT NULL,
+    role            ENUM('SUPER_ADMIN','ADMIN','FACULTY','STUDENT') NOT NULL,
     is_first_login  BOOLEAN       DEFAULT TRUE,
-    created_at      DATETIME      DEFAULT CURRENT_TIMESTAMP
+    created_at      DATETIME      DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (university_id) REFERENCES universities(university_id) ON DELETE CASCADE
 );
 
 -- ============================================
@@ -50,8 +70,12 @@ CREATE TABLE users (
 -- ============================================
 CREATE TABLE departments (
     department_id   INT           PRIMARY KEY AUTO_INCREMENT,
-    dept_name       VARCHAR(100)  NOT NULL UNIQUE,
-    dept_code       VARCHAR(10)   NOT NULL UNIQUE
+    university_id   INT           NOT NULL,
+    dept_name       VARCHAR(100)  NOT NULL,
+    dept_code       VARCHAR(10)   NOT NULL,
+    FOREIGN KEY (university_id) REFERENCES universities(university_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_dept_code_per_uni (university_id, dept_code),
+    UNIQUE KEY uq_dept_name_per_uni (university_id, dept_name)
 );
 
 -- ============================================
@@ -128,7 +152,8 @@ CREATE TABLE admins (
 -- ============================================
 CREATE TABLE courses (
     course_id       INT           PRIMARY KEY AUTO_INCREMENT,
-    course_code     VARCHAR(10)   NOT NULL UNIQUE,
+    university_id   INT           NOT NULL,
+    course_code     VARCHAR(10)   NOT NULL,
     course_name     VARCHAR(100)  NOT NULL,
     credits         INT           NOT NULL,
     total_marks     INT           NOT NULL,
@@ -136,9 +161,11 @@ CREATE TABLE courses (
     semester        INT           NOT NULL,
     dept_id         INT           NOT NULL,
     faculty_id      INT,
+    FOREIGN KEY (university_id) REFERENCES universities(university_id) ON DELETE CASCADE,
     FOREIGN KEY (dept_id)        REFERENCES departments(department_id),
     FOREIGN KEY (faculty_id)     REFERENCES faculty(faculty_id)        ON DELETE SET NULL,
-    CONSTRAINT chk_course_sem    CHECK (semester BETWEEN 1 AND 8)
+    CONSTRAINT chk_course_sem    CHECK (semester BETWEEN 1 AND 8),
+    UNIQUE KEY uq_course_code_per_uni (university_id, course_code)
 );
 
 -- ============================================
@@ -250,10 +277,12 @@ CREATE TABLE exams (
 -- ============================================
 CREATE TABLE grading_scale (
     grade_id        INT           PRIMARY KEY AUTO_INCREMENT,
+    university_id   INT           NOT NULL,
     min_marks       INT           NOT NULL,
     max_marks       INT           NOT NULL,
     grade           VARCHAR(5)    NOT NULL,
-    grade_points    DECIMAL(3,1)  NOT NULL
+    grade_points    DECIMAL(3,1)  NOT NULL,
+    FOREIGN KEY (university_id) REFERENCES universities(university_id) ON DELETE CASCADE
 );
 
 -- ============================================

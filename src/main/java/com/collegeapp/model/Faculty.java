@@ -1,125 +1,170 @@
 package com.collegeapp.model;
 
-/**
- * Faculty entity representing a faculty user in the Campus Management System.
- * Extends User with faculty-specific attributes (employeeId, department, designation).
- * Follows validation-in-setters pattern.
- */
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.collegeapp.util.Validator;
+
 public class Faculty extends User {
-    // Faculty-specific attributes
-    private String employeeId;  // Faculty-visible identifier (NOT system id)
-    private String department;
+
+    private int facultyId;
+    private String employeeId;
+    private String title;
+    private String firstName;
+    private String lastName;
     private String designation;
+    private String mobileNo;
+    private LocalDate dob;
+    private int deptId;
 
-    // -------------------
-    // Constructors
-    // -------------------
-
-    // Default Constructor
     public Faculty() {
         super();
     }
 
-    // Parameterized Constructor
-    public Faculty(long id, String name, String email, String password,
-                   String employeeId, String department, String designation) {
-        super(id, name, email, password, "FACULTY");
+    public Faculty(int userId, String username, String email,
+            String passwordHash, String role, boolean isFirstLogin,
+            LocalDateTime createdAt, int facultyId, String employeeId,
+            String title, String firstName, String lastName,
+            String designation, String mobileNo, LocalDate dob,
+            int deptId) {
+        super(userId, username, email, passwordHash, role, isFirstLogin, createdAt);
+        setFacultyId(facultyId);
         setEmployeeId(employeeId);
-        setDepartment(department);
+        setTitle(title);
+        setFirstName(firstName);
+        setLastName(lastName);
         setDesignation(designation);
+        setMobileNo(mobileNo);
+        setDob(dob);
+        setDeptId(deptId);
     }
-
-    // -------------------
-    // Abstract Method Implementation
-    // -------------------
 
     @Override
-    public void displayDetails() {
-        System.out.println("========== Faculty Details ==========");
-        System.out.println("Name: " + getName());
-        System.out.println("Email: " + getEmail());
-        System.out.println("Employee ID: " + employeeId);
-        System.out.println("Department: " + department);
-        System.out.println("Designation: " + designation);
-        System.out.println("Role: " + getRole());
-        System.out.println("=====================================");
+    public String getDisplayName() {
+        if (title != null) {
+            return title + " " + firstName + " " + lastName;
+        }
+        return firstName + " " + lastName;
     }
 
-    // -------------------
-    // Getters & Setters
-    // -------------------
+    @Override
+    public String getRole() {
+        return "FACULTY";
+    }
 
-    // Employee ID: non-null, non-empty, alphanumeric only
+    public int getFacultyId() {
+        return facultyId;
+    }
+
+    public void setFacultyId(int facultyId) {
+        this.facultyId = facultyId;
+    }
+
     public String getEmployeeId() {
         return employeeId;
     }
 
     public void setEmployeeId(String employeeId) {
-        if (employeeId == null) {
-            throw new IllegalArgumentException("Employee ID cannot be null.");
+        if (!Validator.isValidEmpId(employeeId)) {
+            throw new IllegalArgumentException(
+                    "Invalid employee ID: " + employeeId + ".");
         }
-        String trimmed = employeeId.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Employee ID cannot be empty.");
-        }
-        // Regex Pattern: alphanumeric only
-        if (!trimmed.matches("^[A-Za-z0-9]+$")) {
-            throw new IllegalArgumentException("Employee ID must contain only alphanumeric characters.");
-        }
-        this.employeeId = trimmed;
+        this.employeeId = employeeId;
     }
 
-    // Department: letters and spaces only
-    public String getDepartment() {
-        return department;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDepartment(String department) {
-        if (department == null) {
-            throw new IllegalArgumentException("Department cannot be null.");
-        }
-        String trimmed = department.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Department cannot be empty.");
-        }
-        // Regex Pattern: letters and spaces only
-        if (!trimmed.matches("^[A-Za-z ]+$")) {
-            throw new IllegalArgumentException("Department must contain only letters and spaces.");
-        }
-        this.department = trimmed;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    // Designation: letters and spaces only
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        if (!Validator.isValidName(firstName)) {
+            throw new IllegalArgumentException(
+                    "Invalid first name: " + firstName + ".");
+        }
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        if (!Validator.isValidName(lastName)) {
+            throw new IllegalArgumentException(
+                    "Invalid last name: " + lastName + ".");
+        }
+        this.lastName = lastName;
+    }
+
     public String getDesignation() {
         return designation;
     }
 
     public void setDesignation(String designation) {
-        if (designation == null) {
-            throw new IllegalArgumentException("Designation cannot be null.");
+        if (designation == null || designation.trim().isEmpty()) {
+            throw new IllegalArgumentException("Designation cannot be null or empty.");
         }
-        String trimmed = designation.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Designation cannot be empty.");
-        }
-        // Regex Pattern: letters and spaces only
-        if (!trimmed.matches("^[A-Za-z ]+$")) {
-            throw new IllegalArgumentException("Designation must contain only letters and spaces.");
-        }
-        this.designation = trimmed;
+        this.designation = designation;
     }
 
-    // toString (do NOT print password)
+    public String getMobileNo() {
+        return mobileNo;
+    }
+
+    public void setMobileNo(String mobileNo) {
+        if (!Validator.isValidPhone(mobileNo)) {
+            throw new IllegalArgumentException(
+                    "Invalid mobile number: " + mobileNo +
+                            ". Must be a 10-digit Indian number starting with 6-9.");
+        }
+        this.mobileNo = mobileNo;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        if (dob == null) {
+            throw new IllegalArgumentException("Date of birth cannot be null.");
+        }
+        this.dob = dob;
+    }
+
+    public int getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(int deptId) {
+        this.deptId = deptId;
+    }
+
     @Override
     public String toString() {
         return "Faculty{" +
-                "name='" + getName() + '\'' +
+                "userId=" + getUserId() +
+                ", username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
+                ", role='" + getRole() + '\'' +
+                ", isFirstLogin=" + isFirstLogin() +
+                ", createdAt=" + getCreatedAt() +
+                ", facultyId=" + facultyId +
                 ", employeeId='" + employeeId + '\'' +
-                ", department='" + department + '\'' +
+                ", title='" + title + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", designation='" + designation + '\'' +
-                ", role=" + getRole() +
+                ", mobileNo='" + mobileNo + '\'' +
+                ", dob=" + dob +
+                ", deptId=" + deptId +
                 '}';
-        }   
-
+    }
 }

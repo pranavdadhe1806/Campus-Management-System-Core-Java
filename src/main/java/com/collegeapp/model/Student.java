@@ -1,117 +1,198 @@
 package com.collegeapp.model;
 
-/**
- * Student entity representing a student user in the Campus Management System.
- * Extends User with student-specific attributes (rollNumber, department, year).
- * Follows validation-in-setters pattern.
- */
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.collegeapp.util.Validator;
+
 public class Student extends User {
-    // Student-specific attributes
-    private String rollNumber;  // Student-visible identifier (NOT system id)
-    private String department;
-    private int year;
 
-    // -------------------
-    // Constructors
-    // -------------------
+    private int studentId;
+    private String rollNumber;
+    private String firstName;
+    private String lastName;
+    private String mobileNo;
+    private LocalDate dob;
+    private int academicYear;
+    private String division;
+    private String batch;
+    private int sem;
+    private int deptId;
 
-    // Default Constructor
     public Student() {
         super();
     }
 
-    // Parameterized Constructor
-    public Student(long id, String name, String email, String password,
-                   String rollNumber, String department, int year) {
-        super(id, name, email, password, "STUDENT");
+    public Student(int userId, String username, String email,
+            String passwordHash, String role, boolean isFirstLogin,
+            LocalDateTime createdAt, int studentId, String rollNumber,
+            String firstName, String lastName, String mobileNo,
+            LocalDate dob, int academicYear, String division,
+            String batch, int sem, int deptId) {
+        super(userId, username, email, passwordHash, role, isFirstLogin, createdAt);
+        setStudentId(studentId);
         setRollNumber(rollNumber);
-        setDepartment(department);
-        setYear(year);
+        setFirstName(firstName);
+        setLastName(lastName);
+        setMobileNo(mobileNo);
+        setDob(dob);
+        setAcademicYear(academicYear);
+        setDivision(division);
+        setBatch(batch);
+        setSem(sem);
+        setDeptId(deptId);
     }
-
-    // -------------------
-    // Abstract Method Implementation
-    // -------------------
 
     @Override
-    public void displayDetails() {
-        System.out.println("========== Student Details ==========");
-        System.out.println("Name: " + getName());
-        System.out.println("Email: " + getEmail());
-        System.out.println("Roll Number: " + rollNumber);
-        System.out.println("Department: " + department);
-        System.out.println("Year: " + year);
-        System.out.println("Role: " + getRole());
-        System.out.println("=====================================");
+    public String getDisplayName() {
+        return firstName + " " + lastName;
     }
 
-    // -------------------
-    // Getters & Setters
-    // -------------------
+    @Override
+    public String getRole() {
+        return "STUDENT";
+    }
 
-    // Roll Number: non-null, non-empty, alphanumeric only
+    public int getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
+    }
+
     public String getRollNumber() {
         return rollNumber;
     }
 
     public void setRollNumber(String rollNumber) {
-        if (rollNumber == null) {
-            throw new IllegalArgumentException("Roll number cannot be null.");
+        if (!Validator.isValidRollNo(rollNumber)) {
+            throw new IllegalArgumentException(
+                    "Invalid roll number: " + rollNumber + ". Expected format: CS21IT001");
         }
-        String trimmed = rollNumber.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Roll number cannot be empty.");
-        }
-        // Regex Pattern: alphanumeric only
-        if (!trimmed.matches("^[A-Za-z0-9]+$")) {
-            throw new IllegalArgumentException("Roll number must contain only alphanumeric characters.");
-        }
-        this.rollNumber = trimmed;
+        this.rollNumber = rollNumber;
     }
 
-    // Department: letters and spaces only
-    public String getDepartment() {
-        return department;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setDepartment(String department) {
-        if (department == null) {
-            throw new IllegalArgumentException("Department cannot be null.");
+    public void setFirstName(String firstName) {
+        if (!Validator.isValidName(firstName)) {
+            throw new IllegalArgumentException(
+                    "Invalid first name: " + firstName + ".");
         }
-        String trimmed = department.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Department cannot be empty.");
-        }
-        // Regex Pattern: letters and spaces only
-        if (!trimmed.matches("^[A-Za-z ]+$")) {
-            throw new IllegalArgumentException("Department must contain only letters and spaces.");
-        }
-        this.department = trimmed;
+        this.firstName = firstName;
     }
 
-    // Year: valid academic year (1-4)
-    public int getYear() {
-        return year;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setYear(int year) {
-        if (year < 1 || year > 4) {
-            throw new IllegalArgumentException("Year must be between 1 and 4.");
+    public void setLastName(String lastName) {
+        if (!Validator.isValidName(lastName)) {
+            throw new IllegalArgumentException(
+                    "Invalid last name: " + lastName + ".");
         }
-        this.year = year;
+        this.lastName = lastName;
     }
 
-    // toString (do NOT print password)
+    public String getMobileNo() {
+        return mobileNo;
+    }
+
+    public void setMobileNo(String mobileNo) {
+        if (mobileNo != null && !Validator.isValidPhone(mobileNo)) {
+            throw new IllegalArgumentException(
+                    "Invalid mobile number: " + mobileNo +
+                            ". Must be a 10-digit Indian number starting with 6-9.");
+        }
+        this.mobileNo = mobileNo;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        if (dob == null) {
+            throw new IllegalArgumentException("Date of birth cannot be null.");
+        }
+        this.dob = dob;
+    }
+
+    public int getAcademicYear() {
+        return academicYear;
+    }
+
+    public void setAcademicYear(int academicYear) {
+        if (academicYear < 1 || academicYear > 4) {
+            throw new IllegalArgumentException("Academic year must be between 1 and 4.");
+        }
+        this.academicYear = academicYear;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        if (division == null || division.trim().isEmpty()) {
+            throw new IllegalArgumentException("Division cannot be null or empty.");
+        }
+        this.division = division;
+    }
+
+    public String getBatch() {
+        return batch;
+    }
+
+    public void setBatch(String batch) {
+        if (batch == null || batch.trim().isEmpty()) {
+            throw new IllegalArgumentException("Batch cannot be null or empty.");
+        }
+        this.batch = batch;
+    }
+
+    public int getSem() {
+        return sem;
+    }
+
+    public void setSem(int sem) {
+        if (sem < 1 || sem > 8) {
+            throw new IllegalArgumentException("Semester must be between 1 and 8.");
+        }
+        this.sem = sem;
+    }
+
+    public int getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(int deptId) {
+        this.deptId = deptId;
+    }
+
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + getId() +
-                ", name='" + getName() + '\'' +
+                "userId=" + getUserId() +
+                ", username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
+                ", role='" + getRole() + '\'' +
+                ", isFirstLogin=" + isFirstLogin() +
+                ", createdAt=" + getCreatedAt() +
+                ", studentId=" + studentId +
                 ", rollNumber='" + rollNumber + '\'' +
-                ", department='" + department + '\'' +
-                ", year=" + year +
-                ", role=" + getRole() +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", mobileNo='" + mobileNo + '\'' +
+                ", dob=" + dob +
+                ", academicYear=" + academicYear +
+                ", division='" + division + '\'' +
+                ", batch='" + batch + '\'' +
+                ", sem=" + sem +
+                ", deptId=" + deptId +
                 '}';
     }
 }

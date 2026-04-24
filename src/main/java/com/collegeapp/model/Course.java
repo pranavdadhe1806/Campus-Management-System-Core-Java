@@ -1,85 +1,67 @@
 package com.collegeapp.model;
 
-/**
- * Course entity representing a course in the Campus Management System.
- * Standalone domain entity (does not extend User).
- * Follows validation-in-setters pattern.
- */
+import com.collegeapp.util.Validator;
+
 public class Course {
-    // Course attributes
-    private long courseId;      // System/internal ID
-    private String courseCode;  // User-visible identifier (e.g., CSE101)
+
+    private int courseId;
+    private String courseCode;
     private String courseName;
     private int credits;
-    private String department;
+    private int totalMarks;
+    private int lectureHours;
+    private int semester;
+    private int deptId;
+    private int facultyId;
 
-    // -------------------
-    // Constructors
-    // -------------------
-
-    // Default Constructor
     public Course() {
     }
 
-    // Parameterized Constructor
-    public Course(long courseId, String courseCode, String courseName, int credits, String department) {
-        this.courseId = courseId;
+    public Course(int courseId, String courseCode, String courseName,
+            int credits, int totalMarks, int lectureHours,
+            int semester, int deptId, int facultyId) {
+        setCourseId(courseId);
         setCourseCode(courseCode);
         setCourseName(courseName);
         setCredits(credits);
-        setDepartment(department);
+        setTotalMarks(totalMarks);
+        setLectureHours(lectureHours);
+        setSemester(semester);
+        setDeptId(deptId);
+        setFacultyId(facultyId);
     }
 
-    // -------------------
-    // Getters & Setters
-    // -------------------
-
-    // Course ID: system/internal identifier (immutable)
-    public long getCourseId() {
+    public int getCourseId() {
         return courseId;
     }
 
-    // Course Code: non-null, non-empty, at least 2 uppercase letters followed by at least 2 digits
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
+    }
+
     public String getCourseCode() {
         return courseCode;
     }
 
     public void setCourseCode(String courseCode) {
-        if (courseCode == null) {
-            throw new IllegalArgumentException("Course code cannot be null.");
+        if (!Validator.isValidCourseCode(courseCode)) {
+            throw new IllegalArgumentException(
+                    "Invalid course code: " + courseCode + ".");
         }
-        String trimmed = courseCode.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Course code cannot be empty.");
-        }
-        // Regex Pattern: at least 2 uppercase letters followed by at least 2 digits
-        if (!trimmed.matches("^[A-Z]{2,}[0-9]{2,}$")) {
-            throw new IllegalArgumentException("Course code must contain at least 2 uppercase letters followed by at least 2 digits.");
-        }
-        this.courseCode = trimmed;
+        this.courseCode = courseCode;
     }
 
-    // Course Name: letters and spaces only
     public String getCourseName() {
         return courseName;
     }
 
     public void setCourseName(String courseName) {
-        if (courseName == null) {
-            throw new IllegalArgumentException("Course name cannot be null.");
+        if (courseName == null || courseName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Course name cannot be null or empty.");
         }
-        String trimmed = courseName.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Course name cannot be empty.");
-        }
-        // Regex Pattern: letters and spaces only
-        if (!trimmed.matches("^[A-Za-z ]+$")) {
-            throw new IllegalArgumentException("Course name must contain only letters and spaces.");
-        }
-        this.courseName = trimmed;
+        this.courseName = courseName;
     }
 
-    // Credits: valid range (1-6)
     public int getCredits() {
         return credits;
     }
@@ -91,34 +73,67 @@ public class Course {
         this.credits = credits;
     }
 
-    // Department: letters and spaces only
-    public String getDepartment() {
-        return department;
+    public int getTotalMarks() {
+        return totalMarks;
     }
 
-    public void setDepartment(String department) {
-        if (department == null) {
-            throw new IllegalArgumentException("Department cannot be null.");
+    public void setTotalMarks(int totalMarks) {
+        if (totalMarks <= 0) {
+            throw new IllegalArgumentException("Total marks must be greater than 0.");
         }
-        String trimmed = department.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Department cannot be empty.");
-        }
-        // Regex Pattern: letters and spaces only
-        if (!trimmed.matches("^[A-Za-z ]+$")) {
-            throw new IllegalArgumentException("Department must contain only letters and spaces.");
-        }
-        this.department = trimmed;
+        this.totalMarks = totalMarks;
     }
 
-    // toString (do NOT include system courseId)
+    public int getLectureHours() {
+        return lectureHours;
+    }
+
+    public void setLectureHours(int lectureHours) {
+        if (lectureHours <= 0) {
+            throw new IllegalArgumentException("Lecture hours must be greater than 0.");
+        }
+        this.lectureHours = lectureHours;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public void setSemester(int semester) {
+        if (semester < 1 || semester > 8) {
+            throw new IllegalArgumentException("Semester must be between 1 and 8.");
+        }
+        this.semester = semester;
+    }
+
+    public int getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(int deptId) {
+        this.deptId = deptId;
+    }
+
+    public int getFacultyId() {
+        return facultyId;
+    }
+
+    public void setFacultyId(int facultyId) {
+        this.facultyId = facultyId;
+    }
+
     @Override
     public String toString() {
         return "Course{" +
-                "courseCode='" + courseCode + '\'' +
+                "courseId=" + courseId +
+                ", courseCode='" + courseCode + '\'' +
                 ", courseName='" + courseName + '\'' +
                 ", credits=" + credits +
-                ", department='" + department + '\'' +
+                ", totalMarks=" + totalMarks +
+                ", lectureHours=" + lectureHours +
+                ", semester=" + semester +
+                ", deptId=" + deptId +
+                ", facultyId=" + facultyId +
                 '}';
     }
 }

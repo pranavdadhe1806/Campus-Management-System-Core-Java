@@ -1,89 +1,59 @@
 package com.collegeapp.model;
 
-/**
- * Department entity representing a department in the Campus Management System.
- * Standalone domain entity (does not extend User).
- * Follows validation-in-setters pattern.
- */
+import com.collegeapp.util.Validator;
+
 public class Department {
-    // Department attributes
-    private long departmentId;      // System/internal ID
-    private String departmentCode;  // User-visible identifier (e.g., CSE, ECE)
-    private String departmentName;
 
-    // -------------------
-    // Constructors
-    // -------------------
+    private int departmentId;
+    private String deptName;
+    private String deptCode;
 
-    // Default Constructor
     public Department() {
     }
 
-    // Parameterized Constructor
-    public Department(long departmentId, String departmentCode, String departmentName) {
-        this.departmentId = departmentId;
-        setDepartmentCode(departmentCode);
-        setDepartmentName(departmentName);
+    public Department(int departmentId, String deptName, String deptCode) {
+        setDepartmentId(departmentId);
+        setDeptName(deptName);
+        setDeptCode(deptCode);
     }
 
-    // -------------------
-    // Getters & Setters
-    // -------------------
-
-    // Department ID: system/internal identifier (immutable)
-    public long getDepartmentId() {
+    public int getDepartmentId() {
         return departmentId;
     }
 
-    // Department Code: non-null, non-empty, uppercase letters only, min length 2
-    public String getDepartmentCode() {
-        return departmentCode;
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
     }
 
-    public void setDepartmentCode(String departmentCode) {
-        if (departmentCode == null) {
-            throw new IllegalArgumentException("Department code cannot be null.");
-        }
-        String trimmed = departmentCode.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Department code cannot be empty.");
-        }
-        if (trimmed.length() < 2) {
-            throw new IllegalArgumentException("Department code must be at least 2 characters long.");
-        }
-        // Regex Pattern: uppercase letters only
-        if (!trimmed.matches("^[A-Z]+$")) {
-            throw new IllegalArgumentException("Department code must contain only uppercase letters.");
-        }
-        this.departmentCode = trimmed;
+    public String getDeptName() {
+        return deptName;
     }
 
-    // Department Name: letters and spaces only
-    public String getDepartmentName() {
-        return departmentName;
+    public void setDeptName(String deptName) {
+        if (deptName == null || deptName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Department name cannot be null or empty.");
+        }
+        this.deptName = deptName;
     }
 
-    public void setDepartmentName(String departmentName) {
-        if (departmentName == null) {
-            throw new IllegalArgumentException("Department name cannot be null.");
-        }
-        String trimmed = departmentName.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Department name cannot be empty.");
-        }
-        // Regex Pattern: letters and spaces only
-        if (!trimmed.matches("^[A-Za-z ]+$")) {
-            throw new IllegalArgumentException("Department name must contain only letters and spaces.");
-        }
-        this.departmentName = trimmed;
+    public String getDeptCode() {
+        return deptCode;
     }
 
-    // toString (do NOT include system departmentId)
+    public void setDeptCode(String deptCode) {
+        if (!Validator.isValidDeptCode(deptCode)) {
+            throw new IllegalArgumentException(
+                    "Invalid department code: " + deptCode + ".");
+        }
+        this.deptCode = deptCode;
+    }
+
     @Override
     public String toString() {
         return "Department{" +
-                "departmentCode='" + departmentCode + '\'' +
-                ", departmentName='" + departmentName + '\'' +
+                "departmentId=" + departmentId +
+                ", deptName='" + deptName + '\'' +
+                ", deptCode='" + deptCode + '\'' +
                 '}';
     }
 }
