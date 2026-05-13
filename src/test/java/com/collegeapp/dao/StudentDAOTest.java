@@ -1,3 +1,4 @@
-public class StudentDAOTest {
-    
+package com.collegeapp.dao;
+
+class StudentDAOTest {
 }
